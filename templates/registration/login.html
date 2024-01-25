@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    Login
+{% endblock %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/input_form.css' %}">
+{% endblock %} }
+
+block{% block content %}
+    <div class="container" style="width: 400px">
+        <form action="{% url 'login' %}" method="post">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">Username</label>
+            <input name="username" type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+          </div>
+          <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" id="exampleInputPassword1">
+          </div>
+          <button type="submit" class="btn btn-outline-success" style="margin: 0 auto; display: block;">Submit</button>
+        </form>
+    </div>
+{% endblock %}

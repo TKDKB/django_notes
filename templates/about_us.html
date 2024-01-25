@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    About Us
+{% endblock %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/input_form.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class=" text-secondary px-4 py-5 text-center">
+        <div class="py-5">
+          <h1 class="display-5 fw-bold ">NOTICA.</h1>
+          <div class="col-lg-6 mx-auto">
+            <p class="fs-5 mb-4">Our note-taking web app is all about helping you capture and organize your ideas easily. We're dedicated to making note-taking simple and efficient so you can boost your productivity and creativity. Join us on this journey!</p>
+            <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                <button type="submit" class="btn btn-outline-dark">contact us</button>
+            </div>
+          </div>
+        </div>
+      </div>
+{% endblock %}

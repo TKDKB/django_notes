@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block title %}
+    Author notes
+{% endblock %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/input_form.css' %}">
+{% endblock %}
+
+{% block content %}
+{#  <h1 class="header">notica.</h1>#}
+
+    <div class="container">
+        <div>
+            <a href="{% url 'home'%}">
+                <button type="submit" class="btn btn-outline-dark">main page</button>
+            </a>
+        </div>
+        <div class="text-center">
+            <h2 class="display-5 link-body-emphasis mb-1">{{ author | upper }}</h2>
+        </div>
+        <div>
+            <hr style="width: 300px; margin: 0 auto; display: block; padding: 20px">
+        </div>
+{#        <div>#}
+{#            <a href="{% url 'new-note' %}">#}
+{#                <button type="submit" class="btn btn-outline-dark">создать заметку</button>#}
+{#            </a>#}
+{#        </div>#}
+        <div class="content">
+            {% include 'notes_list.html' %}
+        </div>
+    </div>
+{% endblock %}
+
+{##
+<body class="background">
+<h1 class="header">notica.</h1>
+
+<div>
+    <a href="{% url 'new-note' %}">
+        <button class="form-button">создать заметку</button>
+    </a>
+</div>
+<div class="content">
+    {% for note in notes %}
+    <div class="note_preview">
+        <h3>{{ note.title }}</h3>
+        <div>
+            <a href="{% url 'show-note' note.uuid %}">
+                <button class="form-button">просмотр</button>
+            </a>
+        </div>
+        <div>
+            created at: {{ note.created_at }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+</body>##}

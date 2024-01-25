@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    {{ note.title }}
+{% endblock %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="{% static 'css/input_form.css' %}">
+{% endblock %}
+
+{% block content %}
+    {# <h2 class="header">{{ note.title | upper}}</h2>#}
+    <div class="container">
+        <div>
+            <a href="{% url 'home'%}">
+                <button type="submit" class="btn btn-outline-dark">main page</button>
+            </a>
+        </div>
+        <div class="text-center">
+            <h2 class="display-5 link-body-emphasis mb-1">{{ note.title | upper }}
+
+            </h2>
+            {% if note.is_private == 1 %}
+                <span class="badge text-bg-dark">private</span>
+            {% endif %}
+            <p class="blog-post-meta">{{ note.created_at }}</p>
+
+
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6m2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0m4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4m-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10s-3.516.68-4.168 1.332c-.678.678-.83 1.418-.832 1.664z"/>
+            </svg>
+            <a href="{% url 'author-notes' note.user.username %}" style="text-decoration: none">
+                    {{note.user.username}}
+
+            </a>
+        </div>
+
+        {% if request.user == note.user %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+
+
+                <a href="{%url 'edit-note' note.uuid%}">
+                    <button type="button" class="btn btn-outline-success">edit</button>
+                </a>
+
+                <button type="submit" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal">delete</button>
+
+                <div class="modal" id="exampleModal" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">are you sure?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>you will not be able to undo it.</p>
+                      </div>
+                      <div class="modal-footer">
+
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">cancel</button>
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" name="delete">delete</button>
+                        </form>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+            </div>
+        {% endif %}
+        <hr>
+
+        <div>{{ note.content | safe | linebreaks }}</div>
+
+    </div>
+{% endblock %}
