@@ -27,6 +27,15 @@ class Note(models.Model):
     is_private = models.BooleanField(default=False)
     objects = models.Manager()
 
+    def save(self, *args, **kwargs):
+        try:
+            this = Note.objects.get(id=self.id)
+            if this.image != self.image:
+                this.image.delete()
+        except:
+            pass
+        super(Note, self).save(*args, **kwargs)
+
     class Meta:
         ordering = ['-created_at']
 
@@ -41,21 +50,29 @@ def delete_note(sender, instance: Note, **kwargs):
         note_media_folder.rmdir()
 
 
-@receiver(pre_save, sender=Note)
-def edit_note(sender, instance: Note, **kwargs):
-    if instance.image:
-        note_media_folder = (settings.MEDIA_ROOT / str(instance.uuid))
-        for file in note_media_folder.glob("*"):
-            if str(file) != str(instance.image):  # Сравнение путей до файлов
-                file.unlink(missing_ok=True)
+# @receiver(pre_save, sender=Note)
+# def edit_note(sender, instance: Note, **kwargs):
+#     if instance.image:
+#         note_media_folder = (settings.MEDIA_ROOT / str(instance.uuid))
+#         for file in note_media_folder.glob("*"):
+#             #if str(file) != str(instance.image):  # Сравнение путей до файлов
+#             file.unlink(missing_ok=True)
 
 # @receiver(signal=models.signals.post_init, sender=Note)
 # def post_init_handler(instance, **kwargs):
-#     instance.original_image = instance.image
+#     if instance.image:
+#         instance.original_image = instance.image
+#
 #
 # @receiver(signal=models.signals.post_save, sender=Note)
 # def post_save_handler(instance, **kwargs):
-#     if not instance.image == instance.original_image:
-#         instance.original_image.delete(False)
+#     if instance.image:
+#         note_media_folder = (settings.MEDIA_ROOT / str(instance.uuid))
+#         if not instance.image == instance.original_image:
+#             for file in note_media_folder.glob("*"):
+#                 if str(file) == str(instance.original_image):
+#                     file.unlink(missing_ok=True)
+#                 instance.original_image = instance.image
+
 
 
