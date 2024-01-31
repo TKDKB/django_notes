@@ -3,7 +3,6 @@
         {% if note.is_private == 0 or note.is_private == 1 and note.user == request.user%}
               <div class="col">
                 <div class="card h-100 shadow">
-    {#              <img src="https://dvizhcom.ru/upload/images_tdauto/91100.jpg" class="card-img-top" alt="...">#}
                   <div class="card-body">
                     {% if note.is_private == 1 %}
                         <span class="badge text-bg-dark">private</span>

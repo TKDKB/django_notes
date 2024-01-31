@@ -23,6 +23,9 @@
             <h2 class="display-5 link-body-emphasis mb-1">{{ note.title | upper }}
 
             </h2>
+            {% if note.image%}
+                <img src="{{ note.image.url }}"  style="width: 300px;" alt="...">
+            {% endif %}
             {% if note.is_private == 1 %}
                 <span class="badge text-bg-dark">private</span>
             {% endif %}

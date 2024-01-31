@@ -51,9 +51,13 @@ def edit_note_view(request: WSGIRequest, note_uuid: int):
     if request.method == "GET":
         return render(request, "edit_note.html", {"note": note})
     elif request.method == "POST" and "confirm" in request.POST:
+        print(request.FILES)
+        images = request.FILES.getlist("notenewImage")
         note.title = request.POST["title"]
         note.content = request.POST["content"]
         note.mod_time = datetime.datetime.now()
+        if images:
+            note.image = images[0]
         note.save()
         return HttpResponseRedirect(reverse('show-note', args=[note_uuid]))
 
@@ -64,10 +68,13 @@ def create_note_view(request: WSGIRequest):
         return HttpResponseRedirect(reverse('login'))
     if request.method == "POST":
         if "create" in request.POST:
+            print(request.FILES)
+            images = request.FILES.getlist("noteImage")
             note = Note.objects.create(
                 title=request.POST["title"],
                 content=request.POST["content"],
                 user=request.user,
+                image=images[0] if images else None,
             )
             if 'switch' in request.POST:
                 flex_switch_value = request.POST['switch']

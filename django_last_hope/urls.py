@@ -15,7 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.conf.urls.static import serve
+from django.conf import settings
+from django.urls import path, include, re_path
 from django.contrib.auth.views import LoginView
 from notes.views import home_page_view, create_note_view, show_note_view, greetings_page_view, edit_note_view,\
     about_us_page_view, filter_notes_view, author_notes_view
@@ -35,5 +37,6 @@ urlpatterns = [
     path('note/<note_uuid>', show_note_view, name="show-note"),
     path('edit/<note_uuid>', edit_note_view, name="edit-note"),
     path('filter', filter_notes_view, name="filter-notes"),
-    path('user/<username>/posts', author_notes_view, name="author-notes")
+    path('user/<username>/posts', author_notes_view, name="author-notes"),
+    re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
 ]

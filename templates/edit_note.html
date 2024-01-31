@@ -14,7 +14,7 @@
 {% block content %}
     {#  <h1 class="header"> new note.</h1>#}
     <div class="container">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                 <div>
@@ -28,6 +28,10 @@
                         <button type="button" class="btn btn-outline-dark">back to note</button>
                     </a>
                 </div>
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="form-label">Preview</label>
+              <input name="notenewImage" type="file" class="form-control" id="exampleFormControlInput1">
             </div>
             <div class="mb-3">
               <label for="exampleFormControlInput1" class="form-label">Title</label>
