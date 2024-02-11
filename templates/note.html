@@ -30,6 +30,13 @@
                 <span class="badge text-bg-dark">private</span>
             {% endif %}
             <p class="blog-post-meta">{{ note.created_at }}</p>
+            <p class="text-center">
+                {% for tag in note.tags.all %}
+                    {% if tag %}
+                        <span class="badge text-bg-dark me-2">{{ tag }}</span>
+                    {% endif %}
+                {% endfor %}
+            </p>
 
 
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person" viewBox="0 0 16 16">

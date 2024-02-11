@@ -6,6 +6,7 @@ import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from ckeditor.fields import RichTextField
 
 
 # class User(AbstractUser):
@@ -16,15 +17,23 @@ def upload_to(instance: "Note", filename: str) -> str:
     return f"{instance.uuid}/{filename}"
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Note(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     title = models.CharField(max_length=255)
-    content = models.TextField()
+    content = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to=upload_to, null=True)
-    mod_time = models.DateTimeField(null=True)
+    image = models.ImageField(upload_to=upload_to, null=True, blank=True)
+    mod_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     is_private = models.BooleanField(default=False)
+    tags = models.ManyToManyField(Tag, related_name="notes", blank=True)
     objects = models.Manager()
 
     def save(self, *args, **kwargs):
@@ -37,7 +46,15 @@ class Note(models.Model):
         super(Note, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ['mod_time']
+        indexes = [
+            models.Index(fields=("mod_time",), name="mod_time_index"),
+            # models.Index(fields=("title",), name="title_index"),
+        ]
+
+    def __str__(self):
+        return f"Заметка: \"{self.title}\""
+
 
 
 @receiver(post_delete, sender=Note)

@@ -20,7 +20,7 @@ from django.conf import settings
 from django.urls import path, include, re_path
 from django.contrib.auth.views import LoginView
 from notes.views import home_page_view, create_note_view, show_note_view, greetings_page_view, edit_note_view,\
-    about_us_page_view, filter_notes_view, author_notes_view
+    about_us_page_view, filter_notes_view, author_notes_view, edit_user
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,4 +39,7 @@ urlpatterns = [
     path('filter', filter_notes_view, name="filter-notes"),
     path('user/<username>/posts', author_notes_view, name="author-notes"),
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
+    path("__debug__/", include("debug_toolbar.urls")),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('profile/<username>', edit_user, name="profile")
 ]
