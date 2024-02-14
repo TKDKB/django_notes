@@ -22,7 +22,6 @@
                         <button type="button" class="btn btn-outline-dark">main page</button>
                     </a>
                 </div>
-
             </div>
             <div class="text-center">
                 <h2 class="display-5 link-body-emphasis mb-1">{{ user.username | upper }}</h2>
@@ -34,58 +33,72 @@
                     {% endif %}
                 {% endfor %}
             </p>
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">First Name</label>
-              <input type="text" id="exampleFormControlInput1" class="form-control" name="first name" value="{{ user.first_name }}">
+            <div>
+                <a href="{% url 'author-notes' user.username %}">
+                    <button type="button" class="btn btn-outline-dark">go to notes</button>
+                </a>
             </div>
+            {% if request.user == user %}
+                <div class="mb-3">
+                  <label for="exampleFormControlInput1" class="form-label">First Name</label>
+                  <input type="text" id="exampleFormControlInput1" class="form-control" name="first name" value="{{ user.first_name }}">
+                </div>
 
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Last Name</label>
-              <input type="text" id="exampleFormControlInput1" class="form-control" name="last name" value="{{ user.last_name }}">
-            </div>
+                <div class="mb-3">
+                  <label for="exampleFormControlInput1" class="form-label">Last Name</label>
+                  <input type="text" id="exampleFormControlInput1" class="form-control" name="last name" value="{{ user.last_name }}">
+                </div>
 
-            <div class="mb-3">
-              <label for="exampleFormControlInput1" class="form-label">Phone</label>
-              <input type="text" id="exampleFormControlInput1" class="form-control" name="phone" value="{{ user.phone }}">
-            </div>
+                <div class="mb-3">
+                  <label for="exampleFormControlInput1" class="form-label">Phone</label>
+                  <input type="text" id="exampleFormControlInput1" class="form-control" name="phone" value="{{ user.phone }}">
+                </div>
 
-{#            <div class="mb-3">#}
-{#              <label for="exampleFormControlTextarea1" class="form-label">Last Name</label>#}
-{#              <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="10">{{ note.content }}</textarea>#}
-{#            </div>#}
-{#            <div class="mb-3">#}
-{#              <label for="exampleFormControlInput1" class="form-label">Введите теги через запятую</label>#}
-{#              {% if tag_flag == 1 %}#}
-{#                  <input name="tags" type="text" class="form-control" id="exampleFormControlInput1" value="{% for tag in note.tags.all %}{% if tag %}{{tag}}{{", "}}{% endif %}{% endfor %}">#}
-{#              {% else %}#}
-{#                  <input name="tags" type="text" class="form-control" id="exampleFormControlInput1">#}
-{#              {% endif %}#}
-{#            </div>#}
-            <!-- Блок кнопки -->
-            <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">edit</button>
-            <div class="modal" id="exampleModal" tabindex="-1">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title">are you sure?</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    <p>you will not be able to undo it.</p>
-                  </div>
-                  <div class="modal-footer">
+    {#            <div class="mb-3">#}
+    {#              <label for="exampleFormControlTextarea1" class="form-label">Last Name</label>#}
+    {#              <textarea name="content" class="form-control" id="exampleFormControlTextarea1" rows="10">{{ note.content }}</textarea>#}
+    {#            </div>#}
+    {#            <div class="mb-3">#}
+    {#              <label for="exampleFormControlInput1" class="form-label">Введите теги через запятую</label>#}
+    {#              {% if tag_flag == 1 %}#}
+    {#                  <input name="tags" type="text" class="form-control" id="exampleFormControlInput1" value="{% for tag in note.tags.all %}{% if tag %}{{tag}}{{", "}}{% endif %}{% endfor %}">#}
+    {#              {% else %}#}
+    {#                  <input name="tags" type="text" class="form-control" id="exampleFormControlInput1">#}
+    {#              {% endif %}#}
+    {#            </div>#}
+                <!-- Блок кнопки -->
+                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal">edit</button>
+                <div class="modal" id="exampleModal" tabindex="-1">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title">are you sure?</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        <p>you will not be able to undo it.</p>
+                      </div>
+                      <div class="modal-footer">
 
-                    <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">cancel</button>
+                        <button type="button" class="btn btn-outline-dark" data-bs-dismiss="modal">cancel</button>
 
-                    <form method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-outline-success" name="confirm">confirm</button>
-                    </form>
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-success" name="confirm">confirm</button>
+                        </form>
 
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+            {% else %}
+                {{ user.first_name }}
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">First Name: {{ user.first_name }}</li>
+                  <li class="list-group-item">Last Name: {{ user.last_name }}</li>
+                  <li class="list-group-item">Phone: {{ user.phone }}</li>
+                </ul>
+            {% endif %}
 
         </form>
     </div>

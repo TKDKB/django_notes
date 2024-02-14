@@ -77,7 +77,7 @@ class CustomUserAdmin(UserAdmin):
 
     @admin.display(description="Notes Amount")
     def notes_amount(self, obj: User):
-        return len(list(Note.objects.filter(user__username=obj.username)))
+        return Note.objects.filter(user=obj).count()
 
 
 

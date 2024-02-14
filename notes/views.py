@@ -182,30 +182,13 @@ def author_notes_view(request: WSGIRequest, username: str):
     }
     return render(request, "author_notes.html", context)
 
-
+@login_required
 def edit_user(request: WSGIRequest, username: str):
     user = User.objects.get(username=username)
-    notes_queryset = (Note.objects.filter(user__username=username).
-                      select_related("user")
-                      .prefetch_related("tags")
-                      .annotate(
-                        username=F('user__username'),
-                        tags_list=ArrayAgg("tags__name", distinct=True),
-                      )
-                      .values("user__username", "tags_list"))
-    notes_amount = len(list(notes_queryset))
-    user_tag_list = []
-    for note in notes_queryset:
-        for tag in note["tags_list"]:
-            if tag and tag not in user_tag_list:
-                user_tag_list.append(tag)
-        # print(note["tags_list"])
-    print(user_tag_list)
+    user_tag_list = list(set(Tag.objects.filter(notes__user__username=username).values_list("name", flat=True)))
     if request.method == 'GET':
         context = {
             "user": user,
-            "tag_info": notes_queryset,
-            "notes_amount": notes_amount,
             "user_tag_list": user_tag_list,
         }
         return render(request, "user_profile.html", context)
