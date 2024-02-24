@@ -26,7 +26,6 @@ def home_page_view(request: WSGIRequest):
 
 def filter_notes_view(request: WSGIRequest):
     search = request.GET.get("search", "")
-
     print("def filter notes view | search", search)
 
     context: dict = {

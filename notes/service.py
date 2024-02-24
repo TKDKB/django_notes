@@ -42,7 +42,7 @@ def create_note(request: WSGIRequest) -> Note:
 def filter_notes(search: str) -> QuerySet:
     if search:
         # notes_queryset = Note.objects.filter(Q(title__icontains=search) | Q(content__icontains=search))
-        notes_queryset = (Note.objects.filter(Q(title__icontains=search)))
+        notes_queryset = Note.objects.filter(content__search=search, title__search=search)
 
     else:
         notes_queryset = (Note.objects.all())

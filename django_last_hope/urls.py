@@ -41,5 +41,6 @@ urlpatterns = [
     re_path(r"^media/(?P<path>.*)$", serve, {"document_root": settings.MEDIA_ROOT}),
     path("__debug__/", include("debug_toolbar.urls")),
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('profile/<username>', edit_user, name="profile")
+    path('profile/<username>', edit_user, name="profile"),
+    path('api/', include("notes.api.urls"))
 ]
