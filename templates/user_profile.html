@@ -14,6 +14,16 @@
 {% block content %}
     {#  <h1 class="header"> new note.</h1>#}
     <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <div>
+
+                        <button type="submit" class="btn btn-outline-dark" name="change password">change password</button>
+
+                    </div>
+            </div>
+        </form>
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -23,6 +33,7 @@
                     </a>
                 </div>
             </div>
+
             <div class="text-center">
                 <h2 class="display-5 link-body-emphasis mb-1">{{ user.username | upper }}</h2>
             </div>

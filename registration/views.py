@@ -1,11 +1,17 @@
 import datetime
 
-from django.shortcuts import render
-from django.http import HttpResponseRedirect, Http404
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
 from django.core.handlers.wsgi import WSGIRequest
 from django.db.models import Q
 from .models import User
 from django.urls import reverse
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
+from registration.forms import PasswordResetForm
+from registration.email_senders import PasswordResetEmailSender
 
 
 def register_empty_fields(request: WSGIRequest):
@@ -62,11 +68,40 @@ def register(request: WSGIRequest):
         User.objects.create_user(
             username=request.POST["username"],
             email=request.POST["email"],
-            password=request.POST["password1"]
+            password=request.POST["password1"],
+            is_active=True,
         )
         return HttpResponseRedirect(reverse('home'))
     return register_checker(request)
 
+
+def send_email(request: WSGIRequest):
+    # if request.method == "POST":
+        PasswordResetEmailSender(request, request.user).send_mail()
+        # return HttpResponseRedirect("registration/message.html")
+        return render(request, "registration/message.html")
+
+
+def change_password_receiver(request: WSGIRequest, token: str, uidb: str):
+    user_id = force_str(urlsafe_base64_decode(uidb))
+    user = get_object_or_404(User, id=user_id)
+    if default_token_generator.check_token(user, token):
+        return HttpResponseRedirect(reverse("actually-change-password"))
+    return render(request, "registration/invalid-password-reset.html")
+
+
+def actually_change_password(request: WSGIRequest, uidb, token):
+    form = PasswordResetForm()
+    if request.method == 'POST':
+        form = PasswordResetForm(request.POST)
+        if form.is_valid():
+            print("lallalal")
+
+            request.user.save(update_fields=["password"])
+            update_session_auth_hash(request, request.user)
+            return HttpResponseRedirect(reverse("login"))
+
+    return render(request, 'registration/password-reset-form.html', {'form': form})
 
 
 

@@ -1,5 +1,7 @@
 import datetime
+import uuid
 
+from django_last_hope import settings
 from django.shortcuts import render
 from django.db.models import F
 from django.contrib.auth.decorators import login_required
@@ -10,7 +12,13 @@ from django.db.models import Q
 from .models import Note, Tag
 from registration.models import User
 from django.urls import reverse
+from django.views import View
 from notes.service import create_note, filter_notes, queryset_optimization
+from .history_service import HistoryService
+from django.shortcuts import get_object_or_404
+
+
+
 # Create your views here.
 
 
@@ -71,6 +79,8 @@ def edit_note_view(request: WSGIRequest, note_uuid: int):
         note.tags.set(tags_objects)
         if images:
             note.image = images[0]
+            with open(f"{settings.MEDIA_ROOT}/images/{note.image}", "wb") as image_file:
+                image_file.write(note.image.read())
         note.save()
         # context: dict = {
         #     "notes": notes_queryset[:100]
@@ -120,12 +130,20 @@ def show_note_view(request: WSGIRequest, note_uuid: int):
         # return HttpResponseRedirect(reverse('home'))
         return delete_note_view(request, note_uuid)
     else:
-        try:
-            note = Note.objects.get(uuid=note_uuid)  # Получение только ОДНОЙ записи.
+        # try:
+        #     note = Note.objects.get(uuid=note_uuid)  # Получение только ОДНОЙ записи.
+        #
+        #
+        # except Note.DoesNotExist:
+        #     # Если не найдено такой записи.
+        #     raise Http404
+        history_service = HistoryService(request)
+        note = get_object_or_404(Note, uuid=note_uuid)
+        history_service.add_to_history(note)
+        if len(request.session["history"]) > 20:
+            history_service.del_from_history()
 
-        except Note.DoesNotExist:
-            # Если не найдено такой записи.
-            raise Http404
+        # return HttpResponseRedirect(reverse("show-note", args=note_uuid))
 
         return render(request, "note.html", {"note": note})
 
@@ -181,10 +199,12 @@ def author_notes_view(request: WSGIRequest, username: str):
     }
     return render(request, "author_notes.html", context)
 
+
 @login_required
 def edit_user(request: WSGIRequest, username: str):
-    user = User.objects.get(username=username)
-    user_tag_list = list(set(Tag.objects.filter(notes__user__username=username).values_list("name", flat=True)))
+
+    user = User.objects.get(username=request.user.username)
+    user_tag_list = list(set(Tag.objects.filter(notes__user__username=request.user.username).values_list("name", flat=True)))
     if request.method == 'GET':
         context = {
             "user": user,
@@ -197,3 +217,28 @@ def edit_user(request: WSGIRequest, username: str):
         user.phone = request.POST["phone"]
         user.save()
         return HttpResponseRedirect(reverse('profile', args=[user.username]))
+    elif request.method == "POST" and "change password" in request.POST:
+        return HttpResponseRedirect(reverse("send-email"))
+
+
+
+# class HistoryAddView(View):
+#
+#     def post(self, request: WSGIRequest, note_uuid: uuid):
+#         history_service = HistoryService(request)
+#         note = get_object_or_404(Note, uuid=note_uuid)
+#
+#         if len(request.session["history"]) < 20:
+#             history_service.add_to_history(note)
+#         else:
+#             history_service.del_from_history()
+#
+#         return HttpResponseRedirect(reverse("show-note", args=note_uuid))
+
+
+class HistoryShowView(View):
+
+    def get(self, request: WSGIRequest):
+        history_service = HistoryService(request)
+        queryset = queryset_optimization(Note.objects.filter(uuid__in=history_service.get_history()))
+        return render(request, "home.html", {"notes": queryset})

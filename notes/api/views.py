@@ -1,5 +1,7 @@
 import json
 import uuid
+from django_last_hope import settings
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
@@ -9,7 +11,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.serializers import ModelSerializer
 from notes.models import Note, Tag
 from .permissions import IsOwner, NotPrivateOrDontShow
-from .serializers import NotesListSerializer, NoteCreateSerializer, NoteDetailedSerializer, NoteSerializer, TagSerializer
+from .serializers import NotesListSerializer, NoteCreateSerializer, NoteDetailedSerializer, NoteSerializer, TagSerializer, ImageSerializer
 from rest_framework.filters import SearchFilter, OrderingFilter
 
 
@@ -103,3 +105,16 @@ class GenericREDNoteAPIView(GenericAPIView):
         note = get_object_or_404(self.get_queryset(), uuid=uuid)
         note.delete()
         return Response(status=204)
+
+
+class UploadImageAPIView(GenericAPIView):
+    serializer_class = ImageSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        image: InMemoryUploadedFile = serializer.validated_data["image"]
+        with open(f"{settings.MEDIA_ROOT}/images/{image.name}", "wb") as image_file:
+            image_file.write(image.read())
+
+        return Response({"name": image.name, "url": "media/images/" + image.name})

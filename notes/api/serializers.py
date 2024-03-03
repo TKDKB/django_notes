@@ -52,3 +52,11 @@ class NoteDetailedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ["uuid", "title", "content", "created_at", "image", "mod_time", "user", "is_private", "tags"]
+
+
+class ImageSerializer(serializers.Serializer):
+    image = serializers.ImageField(write_only=True)
+    # url = serializers.CharField(max_length=255, read_only=True)
+
+    class Meta:
+        fields = ["image"]

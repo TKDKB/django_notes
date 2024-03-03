@@ -3,5 +3,8 @@ from django.urls import path
 from registration.views import register
 
 urlpatterns = [
-    path("register/", register, name="register")]
+    path("register/", register, name="register"),
+
+    # path("history/", history, name="history"),
+]
 

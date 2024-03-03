@@ -1,4 +1,6 @@
 import datetime
+import os
+from django_last_hope.settings import MEDIA_ROOT
 from django.db.models.signals import post_delete, pre_save
 from django.conf import settings
 from django.dispatch import receiver
@@ -29,18 +31,22 @@ class Note(models.Model):
     title = models.CharField(max_length=255)
     content = RichTextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    image = models.ImageField(upload_to=upload_to, null=True, blank=True)
+    # image = models.ImageField(upload_to="images/", null=True, blank=True)
+    image = models.CharField(max_length=255, null=True, blank=True)
+
     mod_time = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     is_private = models.BooleanField(default=False)
-    tags = models.ManyToManyField(Tag, related_name="notes", blank=True)
+    tags = models.ManyToManyField(Tag, related_name="notes", null=True, blank=True)
     objects = models.Manager()
 
     def save(self, *args, **kwargs):
         try:
-            this = Note.objects.get(id=self.id)
-            if this.image != self.image:
-                this.image.delete()
+            this = Note.objects.get(uuid=self.uuid)
+            if self.image and this.image and this.image != self.image:
+                print("bitch")
+                os.remove(MEDIA_ROOT / "images" / this.image)
+                (MEDIA_ROOT / "images" / this.image).unlink(missing_ok=True)
         except:
             pass
         super(Note, self).save(*args, **kwargs)
@@ -56,15 +62,13 @@ class Note(models.Model):
         return f"Заметка: \"{self.title}\""
 
 
-
 @receiver(post_delete, sender=Note)
 def delete_note(sender, instance: Note, **kwargs):
     if instance.image:
-        note_media_folder = (settings.MEDIA_ROOT / str(instance.uuid))
-        for file in note_media_folder.glob("*"):
-            instance.image.delete(False)
-            file.unlink(missing_ok=True)
-        note_media_folder.rmdir()
+        # note_media_folder = (settings.MEDIA_ROOT / "images")
+        os.remove(MEDIA_ROOT / "images" / instance.image)
+        (MEDIA_ROOT / "images" / instance.image).unlink(missing_ok=True)
+        # note_media_folder.rmdir()
 
 
 # @receiver(pre_save, sender=Note)

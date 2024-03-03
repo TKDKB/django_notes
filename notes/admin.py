@@ -35,7 +35,7 @@ class NoteAdmin(admin.ModelAdmin):
     @admin.display(description="img")
     def img(self, obj: Note):
         if obj.image:
-            return mark_safe(f'<img src="{obj.image.url}" height="128">')
+            return mark_safe(f'<img src="{obj.image}" height="128">')
         return "X"
 
     def get_queryset(self, request):

@@ -3,6 +3,7 @@ from notes.models import Note, Tag
 from django.db.models import QuerySet, Q
 from django.db.models import F
 from django.contrib.postgres.aggregates import ArrayAgg
+from django_last_hope import settings
 
 
 def create_note(request: WSGIRequest) -> Note:
@@ -13,6 +14,8 @@ def create_note(request: WSGIRequest) -> Note:
         user=request.user,
         image=request.FILES.get("noteImage"),
     )
+    with open(f"{settings.MEDIA_ROOT}/images/{note.image}", "wb") as image_file:
+        image_file.write(note.image.read())
     if 'switch' in request.POST:
         flex_switch_value = request.POST['switch']
         # print("switch value:", flex_switch_value)
@@ -64,3 +67,4 @@ def queryset_optimization(queryset: QuerySet) -> QuerySet:
         .distinct()
         .order_by("-mod_time")
     )
+

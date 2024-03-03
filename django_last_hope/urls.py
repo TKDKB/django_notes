@@ -20,7 +20,8 @@ from django.conf import settings
 from django.urls import path, include, re_path
 from django.contrib.auth.views import LoginView
 from notes.views import home_page_view, create_note_view, show_note_view, greetings_page_view, edit_note_view,\
-    about_us_page_view, filter_notes_view, author_notes_view, edit_user
+    about_us_page_view, filter_notes_view, author_notes_view, edit_user, HistoryShowView
+from registration.views import change_password_receiver, actually_change_password, send_email
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,5 +43,9 @@ urlpatterns = [
     path("__debug__/", include("debug_toolbar.urls")),
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('profile/<username>', edit_user, name="profile"),
-    path('api/', include("notes.api.urls"))
+    path('send_reset_email', send_email, name='send-email'),
+    path('profile/change_password', change_password_receiver, name='change-password-reciever'),
+    path('profile/change_password_form/<uidb>/<token>/', actually_change_password, name='actually-change-password'),
+    path('api/', include("notes.api.urls")),
+    path('history/', HistoryShowView.as_view(), name='history'),
 ]
