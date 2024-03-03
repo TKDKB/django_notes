@@ -14,9 +14,14 @@ class HistoryService:
             self._session["history"] = []
 
     def add_to_history(self, note: Note):
+
         if note.uuid in self._session["history"] and len(self._session["history"]) < 20:
             self._session["history"].remove(str(note.uuid))
         self._session["history"].append(str(note.uuid))
+
+        if len(self._session["history"]) > 20:
+            self._session["history"].pop(0)
+
         self._session.save()
 
     def del_from_history(self):

@@ -140,8 +140,8 @@ def show_note_view(request: WSGIRequest, note_uuid: int):
         history_service = HistoryService(request)
         note = get_object_or_404(Note, uuid=note_uuid)
         history_service.add_to_history(note)
-        if len(request.session["history"]) > 20:
-            history_service.del_from_history()
+        # if len(request.session["history"]) > 20:
+        #     history_service.del_from_history()
 
         # return HttpResponseRedirect(reverse("show-note", args=note_uuid))
 

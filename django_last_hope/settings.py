@@ -302,4 +302,8 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 EMAIL_HOST_USER = 'bulanovichvyacheslav@gmail.com'
+DEFAULT_FROM_EMAIL = 'bulanovichvyacheslav@gmail.com'
 EMAIL_HOST_PASSWORD = 'utph odfd ssqe fdcc'
+
+
+PATH_FOR_LOGS = "usersActivity.log"

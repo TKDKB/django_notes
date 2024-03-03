@@ -81,28 +81,26 @@ def send_email(request: WSGIRequest):
         # return HttpResponseRedirect("registration/message.html")
         return render(request, "registration/message.html")
 
-
-def change_password_receiver(request: WSGIRequest, token: str, uidb: str):
-    user_id = force_str(urlsafe_base64_decode(uidb))
-    user = get_object_or_404(User, id=user_id)
-    if default_token_generator.check_token(user, token):
-        return HttpResponseRedirect(reverse("actually-change-password"))
-    return render(request, "registration/invalid-password-reset.html")
-
-
-def actually_change_password(request: WSGIRequest, uidb, token):
-    form = PasswordResetForm()
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            print("lallalal")
-
-            request.user.save(update_fields=["password"])
-            update_session_auth_hash(request, request.user)
-            return HttpResponseRedirect(reverse("login"))
-
-    return render(request, 'registration/password-reset-form.html', {'form': form})
-
+# def change_password_receiver(request: WSGIRequest, token: str, uidb: str):
+#     user_id = force_str(urlsafe_base64_decode(uidb))
+#     user = get_object_or_404(User, id=user_id)
+#     if default_token_generator.check_token(user, token):
+#         return HttpResponseRedirect(reverse("actually-change-password"))
+#     return render(request, "registration/invalid-password-reset.html")
+#
+#
+# def actually_change_password(request: WSGIRequest, uidb, token):
+#     form = PasswordResetForm()
+#     if request.method == 'POST':
+#         form = PasswordResetForm(request.POST)
+#         if form.is_valid():
+#             print("lallalal")
+#
+#             request.user.save(update_fields=["password"])
+#             update_session_auth_hash(request, request.user)
+#             return HttpResponseRedirect(reverse("login"))
+#
+#     return render(request, 'registration/password-reset-form.html', {'form': form})
 
 
 # def register1(request: WSGIRequest):
@@ -142,3 +140,18 @@ def actually_change_password(request: WSGIRequest, uidb, token):
 #         password=request.POST["password1"]
 #     )
 #     return HttpResponseRedirect(reverse('home'))
+def change_password_receiver(request: WSGIRequest, token: str, uidb: str):
+    user_id = force_str(urlsafe_base64_decode(uidb))
+    user = get_object_or_404(User, id=user_id)
+    if default_token_generator.check_token(user, token):
+        form = PasswordResetForm()
+        if request.method == 'POST':
+            form = PasswordResetForm(request.POST)
+            if form.is_valid():
+                user.set_password(form.cleaned_data["password1"])
+                user.save(update_fields=["password"])
+                update_session_auth_hash(request, request.user)
+                return HttpResponseRedirect(reverse("login"))
+        return render(request, 'registration/password-reset-form.html', {'form': form})
+
+    return render(request, "registration/invalid-password-reset.html")
