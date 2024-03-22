@@ -200,7 +200,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 if os.environ.get("COLLECT_STATIC"):
-    STATIC_ROOT = BASE_DIR / 'static'
+    STATIC_ROOT = "/var/www/django_last_hope/static"
 
 else:
     STATICFILES_DIRS = [
