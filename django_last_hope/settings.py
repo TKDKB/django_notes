@@ -126,6 +126,7 @@ DATABASES = {
         "PORT": 5432,
     }
 }
+print(DATABASES)
 
 REDIS_CACHE = os.environ.get("REDIS_CACHE_URL")
 
