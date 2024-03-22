@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 from datetime import timedelta
 from pathlib import Path
+import os
+
+from django.core.cache.backends.locmem import LocMemCache
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^690(by%*-3#-rn()chysa)6(+1&$x_#1zytgh4jgt)k9*!b08'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-^690(by%*-3#-rn()chysa)6(+1&$x_#1zytgh4jgt)k9*!b08')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DJANGO_DEBUG', '0') == '1'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 INTERNAL_IPS = [
     # ...
@@ -45,7 +48,6 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    "debug_toolbar",
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -60,6 +62,11 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 ]
 
+if DEBUG:
+    INSTALLED_APPS += [
+        "debug_toolbar",
+    ]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -68,10 +75,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "notes.custom_middleware.LogsMiddleware",
 
 ]
+if DEBUG:
+    MIDDLEWARE += [
+        "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 ROOT_URLCONF = 'django_last_hope.urls'
 
@@ -107,14 +119,36 @@ WSGI_APPLICATION = 'django_last_hope.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': "notes_django_project",
-        "USER": "slava_for_notes",
-        "PASSWORD": "12345678",
-        "HOST": "127.0.0.1",  # IP адрес или домен СУБД.
+        'NAME': os.environ.get("DATABASE_NAME"),
+        "USER": os.environ.get("USER"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
+        "HOST": os.environ.get("DATABASE_HOST"),  # IP адрес или домен СУБД.
         "PORT": 5432,
     }
 }
 
+REDIS_CACHE = os.environ.get("REDIS_CACHE_URL")
+
+if REDIS_CACHE:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": REDIS_CACHE,
+            "KEY_PREFIX": "test_django_last_hope_" if DEBUG else "django_last_hope_",
+        }
+    }
+
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "KEY_PREFIX": "test_django_last_hope_" if DEBUG else "django_last_hope_",
+            "OPTIONS": {
+                "MAX_ENTRIES": 10,
+                "CULL_FREQUENCY": 2,  # 1/2
+            },
+        }
+    }
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
@@ -301,9 +335,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
-EMAIL_HOST_USER = 'bulanovichvyacheslav@gmail.com'
-DEFAULT_FROM_EMAIL = 'bulanovichvyacheslav@gmail.com'
-EMAIL_HOST_PASSWORD = 'utph odfd ssqe fdcc'
-
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
 
 PATH_FOR_LOGS = "usersActivity.log"
