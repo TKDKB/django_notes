@@ -4,6 +4,11 @@ After=syslog.target network.target
 
 
 [Service]
+
+User=ubuntuslava
+Group=www-data
+Restart=always
+
 Environment=DJANGO_SECRET_KEY=bfh249hu93bhugu34h0f3f43f3gh
 Environment=DJANGO_DEBUG=0
 Environment=DATABASE_NAME=notes_django_project
@@ -11,7 +16,12 @@ Environment=DATABASE_USER=slava_for_notes
 Environment=DATABASE_PASSWORD=12345678
 Environment=DATABASE_HOST=127.0.0.1
 Environment=REDIS_CACHE_URL=redis://127.0.0.1:6379
-Environment=COLLECT_STATIC=
+Environment=COLLECT_STATIC=1
 Environment=EMAIL_HOST_USER=bulanovichvyacheslav@gmail.com
 Environment=DEFAULT_FROM_EMAIL=bulanovichvyacheslav@gmail.com
 Environment=EMAIL_HOST_PASSWORD=utph odfd ssqe fdcc
+
+ExecStart=/home/ubuntuslava/django_notes/venv/bin/gunicorn -w 2 -b 127.0.0.1:8000 django_last_hope.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
