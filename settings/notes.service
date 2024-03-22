@@ -9,6 +9,7 @@ User=ubuntuslava
 Group=www-data
 Restart=always
 
+WorkingDirectory=/home/ubuntuslava/django_notes
 Environment=DJANGO_SECRET_KEY=bfh249hu93bhugu34h0f3f43f3gh
 Environment=DJANGO_DEBUG=0
 Environment=DATABASE_NAME=notes_django_project
